@@ -21,7 +21,7 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 == Changelog ==
 
 = 0.2 =
-Added a field to the user profile that displays the activation code. This field is only show to admins. 
+Added a field to the user profile that displays the activation code. This field is only shown to admins. 
 
-= 0.1 = 
-* First version
+= 0.1 =
+First version
