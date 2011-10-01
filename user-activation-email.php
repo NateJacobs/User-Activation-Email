@@ -4,7 +4,7 @@
  *	Plugin Name: User Activation Email
  *	Plugin URI: https://github.com/NateJacobs/User-Activation-Email
  *	Description: Add an activation code to the new user email sent once a user registers. The user must enter this activation code in addition to a username and password to log in successfully the first time.
- *	Version: 0.1
+ *	Version: 0.2
  *	License: GPL V2
  *	Author: Nate Jacobs <nate@natejacobs.org>
  *	Author URI: http://natejacobs.org
@@ -18,10 +18,16 @@ class UserActivationEmail
 	// hook into actions and filters
 	public function __construct()
 	{
+		// since 0.1
 		add_filter( 'authenticate', array( __CLASS__, 'check_user_activation_code' ), 10, 3 );
 		add_action( 'login_form', array( __CLASS__, 'add_login_field' ) );
 		add_action( 'user_register', array( __CLASS__, 'add_activation_code' ) );
 		add_action( 'wp_login', array( __CLASS__, 'update_activation_code' ) );
+		// since 0.2
+		add_action( 'show_user_profile', array( __CLASS__, 'add_user_profile_fields' ) );
+		add_action( 'edit_user_profile', array( __CLASS__, 'add_user_profile_fields' ) );
+		add_action( 'personal_options_update', array( __CLASS__, 'save_user_profile_fields' ) );
+		add_action( 'edit_user_profile_update', array( __CLASS__, 'save_user_profile_fields' ) );
 	}
 	
 	/** 
@@ -33,6 +39,10 @@ class UserActivationEmail
 	 *
 	 *	@author		Nate Jacobs
 	 *	@since		0.1
+	 *
+	 *	@param	string	$user
+	 *	@param	string	$user_login
+	 *	@param	string	$password
 	 */
 	public function check_user_activation_code( $user, $user_login, $password )
 	{
@@ -81,6 +91,8 @@ class UserActivationEmail
 	 *
 	 *	@author		Nate Jacobs
 	 *	@since		0.1
+	 *	
+	 *	@param	string	$user_login
 	 */
 	public function update_activation_code( $user_login )
 	{
@@ -117,6 +129,9 @@ class UserActivationEmail
 	 *
 	 *	@author		Nate Jacobs
 	 *	@since		0.1
+	 *
+	 *	@param	int	$string_length
+	 *	@param	string	$character_set
 	 */
 	private function createRandomString( $string_length, $character_set ) 
 	{
@@ -137,6 +152,8 @@ class UserActivationEmail
 	 *
 	 *	@author		Nate Jacobs
 	 *	@since		0.1
+	 *
+	 *	@param	int	$user_id
 	 */
 	public function add_activation_code( $user_id )
 	{
@@ -146,7 +163,52 @@ class UserActivationEmail
 		add_user_meta( $user_id, self::user_meta, $activation_code );
 	}
 	
+	/** 
+	 *	Add a User Profile Field
+	 *
+	 *	Adds a field that shows the users activation code on their user profile page.
+	 *	This field is only shown to admins.
+	 *
+	 *	@author		Nate Jacobs
+	 *	@since		0.2
+	 *
+	 *	@param	string	$user
+	 */
+	public function add_user_profile_fields( $user )
+	{
+		if ( current_user_can( 'manage_options', $user->ID ) )
+		{
+		?>
+		<h3>User Activation Email</h3>
+		<p>You may reset this user's activation code. If it reads 'active', the user has activated his/her account.</p>
+		<table class="form-table">
+		<tr>
+			<th><label for="activation-code">Activation Code (10 characters)</label></th>
+			<td>
+				<input type="text" id="activation-code" name="activation-code" value="<?php echo esc_attr( get_the_author_meta( self::user_meta, $user->ID ) ); ?>" class="regular-text">
+			</td>
+		</tr>
+		</table>
+		<?php
+		}	
+	}
 	
+	/** 
+	 *	Save Any Changes to User Profile Field
+	 *
+	 *	This method saves any changes made to the activation code.
+	 *
+	 *	@author		Nate Jacobs
+	 *	@since		0.2
+	 *
+	 *	@param	int	$user_id
+	 */
+	public function save_user_profile_fields( $user_id )
+	{
+		if( !current_user_can( 'manage_options', $user_id ) )
+			return false;
+		update_user_meta( $user_id, self::user_meta, $_POST['activation-code'] );
+	}
 }
 new UserActivationEmail();
 
@@ -160,6 +222,9 @@ if ( !function_exists('wp_new_user_notification') ) :
 	 *
 	 *	@author		Nate Jacobs
 	 *	@since		0.1
+	 *
+	 *	@param	int	$user_id
+	 *	@param	string	$plaintext_pass
 	 */
 	function wp_new_user_notification( $user_id, $plaintext_pass = '' )
 	{

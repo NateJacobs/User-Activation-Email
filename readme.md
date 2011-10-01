@@ -5,3 +5,5 @@ This is a WordPress plugin. Send a custom email to a new user with an activation
 ###Changelog###
 ==0.1==
 Initial plugin
+==0.2==
+Added a field to the user profile that displays the activation code. This field is only show to admins. 
