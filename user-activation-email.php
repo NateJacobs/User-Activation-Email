@@ -47,7 +47,7 @@ class UserActivationEmail
 	public function check_user_activation_code( $user, $user_login, $password )
 	{
 		// get user data by login
-		$user = get_userdatabylogin( $user_login );
+		$user = get_user_by( 'login',( $user_login );
 		
 		// if the user has entered something in the user name box
 		if ( $user_login )
@@ -97,7 +97,7 @@ class UserActivationEmail
 	public function update_activation_code( $user_login )
 	{
 		// get user data by login
-		$user = get_userdatabylogin( $user_login );
+		$user = get_user_by( 'login', $user_login );
 		// change the custom user meta to show the user has already activated
 		update_user_meta( $user->ID, self::user_meta, 'active' );
 	}
