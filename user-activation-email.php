@@ -4,7 +4,7 @@
  *	Plugin Name: User Activation Email
  *	Plugin URI: https://github.com/NateJacobs/User-Activation-Email
  *	Description: Add an activation code to the new user email sent once a user registers. The user must enter this activation code in addition to a username and password to log in successfully the first time.
- *	Version: 0.2
+ *	Version: 0.3
  *	License: GPL V2
  *	Author: Nate Jacobs <nate@natejacobs.org>
  *	Author URI: http://natejacobs.org
@@ -28,7 +28,22 @@ class UserActivationEmail
 		add_action( 'edit_user_profile', array( __CLASS__, 'add_user_profile_fields' ) );
 		add_action( 'personal_options_update', array( __CLASS__, 'save_user_profile_fields' ) );
 		add_action( 'edit_user_profile_update', array( __CLASS__, 'save_user_profile_fields' ) );
+		// since 0.3
+		register_activation_hook( __FILE__, array( __CLASS__, 'activate' ) );
 	}
+	
+	/** 
+	 *	Plugin Activation
+	 *
+	 *	Registers the uninstall hook
+	 *
+	 *	@author		Nate Jacobs
+	 *	@since		0.3
+	 */
+	public function activate()
+	{
+		register_uninstall_hook( __FILE__, array( __CLASS__, 'uninstall' ) );
+	}	
 	
 	/** 
 	 *	Check Activation Code
@@ -210,6 +225,27 @@ class UserActivationEmail
 		if( !current_user_can( 'manage_options', $user_id ) )
 			return false;
 		update_user_meta( $user_id, self::user_meta, $_POST['activation-code'] );
+	}
+	
+	/** 
+	 *	Uninstall
+	 *
+	 *	Loops through all users and removes the custom_user_meta of uae_user_activation_code
+	 *
+	 *	@author		Nate Jacobs
+	 *	@since		0.3
+	 */
+	public function uninstall()
+	{
+		// limit user data returned to just the id
+		$args = array( 'fields' => 'ID' );
+		$users = get_users( $args );
+		// loop through each user
+		foreach ( $users as $user )
+		{
+			// delete the custom user meta in the wp_usermeta table
+			delete_user_meta( $user, self::user_meta );
+		}
 	}
 }
 new UserActivationEmail();
