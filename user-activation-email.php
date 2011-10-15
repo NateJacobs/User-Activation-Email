@@ -33,17 +33,50 @@ class UserActivationEmail
 	}
 	
 	/** 
-	 *	Plugin Activation
+	 *	Activation
 	 *
-	 *	Registers the uninstall hook
+	 *	Upon plugin activation create a custom user meta key of uae_user_activation_code
+	 *	for all users and set the value to active (user is already active). Also registers
+	 *	uninstall hook.
 	 *
 	 *	@author		Nate Jacobs
 	 *	@since		0.3
 	 */
 	public function activate()
 	{
+		// limit user data returned to just the id
+		$args = array( 'fields' => 'ID' );
+		$users = get_users( $args );
+		// loop through each user
+		foreach ( $users as $user )
+		{
+			// add the custom user meta to the wp_usermeta table
+			add_user_meta( $user, self::user_meta, 'active' );
+		}
+		
 		register_uninstall_hook( __FILE__, array( __CLASS__, 'uninstall' ) );
-	}	
+	}
+	
+	/** 
+	 *	Uninstall
+	 *
+	 *	Loops through all users and removes the user meta of uae_user_activation_code
+	 *
+	 *	@author		Nate Jacobs
+	 *	@since		0.3
+	 */
+	public function uninstall()
+	{
+		// limit user data returned to just the id
+		$args = array( 'fields' => 'ID' );
+		$users = get_users( $args );
+		// loop through each user
+		foreach ( $users as $user )
+		{
+			// delete the custom user meta in the wp_usermeta table
+			delete_user_meta( $user, self::user_meta );
+		}
+	}
 	
 	/** 
 	 *	Check Activation Code
@@ -225,27 +258,6 @@ class UserActivationEmail
 		if( !current_user_can( 'manage_options', $user_id ) )
 			return false;
 		update_user_meta( $user_id, self::user_meta, $_POST['activation-code'] );
-	}
-	
-	/** 
-	 *	Uninstall
-	 *
-	 *	Loops through all users and removes the custom_user_meta of uae_user_activation_code
-	 *
-	 *	@author		Nate Jacobs
-	 *	@since		0.3
-	 */
-	public function uninstall()
-	{
-		// limit user data returned to just the id
-		$args = array( 'fields' => 'ID' );
-		$users = get_users( $args );
-		// loop through each user
-		foreach ( $users as $user )
-		{
-			// delete the custom user meta in the wp_usermeta table
-			delete_user_meta( $user, self::user_meta );
-		}
 	}
 }
 new UserActivationEmail();
