@@ -46,11 +46,13 @@ class UserActivationEmail
 	 */
 	public function check_user_activation_code( $user, $user_login, $password )
 	{
+		$activation_code = '';
+		
 		// get user data by login
-		$user = get_user_by( 'login',( $user_login );
+		$user = get_user_by( 'login', $user_login );
 		
 		// if the user has entered something in the user name box
-		if ( $user_login )
+		if ( $user )
 		{
 			// get the custom user meta defined during registration
 			$activation_code = get_user_meta( $user->ID, self::user_meta, true );
