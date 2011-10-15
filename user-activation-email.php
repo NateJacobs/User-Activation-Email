@@ -19,7 +19,7 @@ class UserActivationEmail
 	public function __construct()
 	{
 		// since 0.1
-		add_filter( 'authenticate', array( __CLASS__, 'check_user_activation_code' ), 10, 3 );
+		add_filter( 'authenticate', array( __CLASS__, 'check_user_activation_code' ), 11, 3 );
 		add_action( 'login_form', array( __CLASS__, 'add_login_field' ) );
 		add_action( 'user_register', array( __CLASS__, 'add_activation_code' ) );
 		add_action( 'wp_login', array( __CLASS__, 'update_activation_code' ) );
@@ -79,7 +79,7 @@ class UserActivationEmail
 				// register a new error with the error message set above
 				$user = new WP_Error( 'access_denied', __( self::error_message ) );
 				// deny access to login and send back to login page
-				remove_action( 'authenticate', 'wp_authenticate_username_password', 20 );
+				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20 );
 			}
 		}	
 		return $user;
