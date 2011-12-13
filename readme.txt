@@ -4,7 +4,7 @@ Contributors: NateJacobs
 Tags: user, registration, activation, email
 Requires at least: 3.0
 Tested up to: 3.2.1
-Stable tag: 0.2
+Stable tag: 0.3
 
 Require users to enter an activation code to access the site the first time. The activation code is emailed upon user registration.
 
@@ -19,6 +19,10 @@ The administrator may reset the activation code or enter a new one from the user
 Extract the zip file and just drop the contents in the wp-content/plugins/ directory of your WordPress installation and then activate the Plugin from Plugins page.
 
 == Changelog ==
+
+= 0.3 =
+WordPress 3.3 compatible
+Localized and available for translation
 
 = 0.2 =
 Added a field to the user profile that displays the activation code. This field is only shown to admins. 

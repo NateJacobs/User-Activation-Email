@@ -13,11 +13,12 @@
 class UserActivationEmail
 {
 	CONST user_meta = "uae_user_activation_code";
-	CONST error_message = "<strong>ERROR</strong>: Sorry, that activation code does not match. Please try again. You can find the activation code in your welcome email.";
 	
 	// hook into actions and filters
 	public function __construct()
 	{
+		// since 0.3
+		add_action('init', array( __CLASS__, 'localization' ) );
 		// since 0.1
 		add_filter( 'authenticate', array( __CLASS__, 'check_user_activation_code' ), 11, 3 );
 		add_action( 'login_form', array( __CLASS__, 'add_login_field' ) );
@@ -30,6 +31,10 @@ class UserActivationEmail
 		add_action( 'edit_user_profile_update', array( __CLASS__, 'save_user_profile_fields' ) );
 		// since 0.3
 		register_activation_hook( __FILE__, array( __CLASS__, 'activate' ) );
+	}
+	
+	public function localization() {
+  		load_plugin_textdomain( 'user-activation-email', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' ); 
 	}
 	
 	/** 
@@ -108,10 +113,10 @@ class UserActivationEmail
 		if ( empty( $user_login ) || empty($password) )
 		{
 			if ( empty($username) )
-				$user = new WP_Error( 'empty_username', __( '<strong>ERROR</strong>: The username field is empty.' ) );
+				$user = new WP_Error( 'empty_username', _e( '<strong>ERROR</strong>: The username field is empty.', 'user-activation-email' ) );
 	
 			if ( empty($password) )
-				$user = new WP_Error( 'empty_password', __( '<strong>ERROR</strong>: The password field is empty.' ) );
+				$user = new WP_Error( 'empty_password', _e( '<strong>ERROR</strong>: The password field is empty.', 'user-activation-email' ) );
 		}
 		else
 		{
@@ -125,7 +130,7 @@ class UserActivationEmail
 			if ( $_POST['activation-code'] !== $activation_code )
 			{
 				// register a new error with the error message set above
-				$user = new WP_Error( 'access_denied', __( self::error_message ) );
+				$user = new WP_Error( 'access_denied', _e( 'Sorry, that activation code does not match. Please try again. You can find the activation code in your welcome email.', 'user-activation-email' ) );
 				// deny access to login and send back to login page
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20 );
 			}
@@ -164,7 +169,7 @@ class UserActivationEmail
 	{
 		?>
 		<p>
-			<label for="activation-code"><?php echo __( 'Activation Code (New User Only)' ); ?><br>
+			<label for="activation-code"><?php echo __( 'Activation Code (New User Only)', 'user-activation-email' ); ?><br>
 				<input type="text" id="activation-code" class="input" name="activation-code" tabindex="20" value="<?php if( isset( $_POST['activation-code'] ) ) echo $_POST['activation-code']; ?>">
 			</label>
 		</p>
@@ -284,20 +289,20 @@ if ( !function_exists('wp_new_user_notification') ) :
 		$user_login = stripslashes($user->user_login); 
 		$user_email = stripslashes($user->user_email); 
 
-		$message  = sprintf(__('New user registration on your blog %s:'), get_option('blogname')) . "\r\n\r\n"; 
-		$message .= sprintf(__('Username: %s'), $user_login) . "\r\n\r\n"; 
-		$message .= sprintf(__('E-mail: %s'), $user_email) . "\r\n"; 
+		$message  = sprintf(__('New user registration on your blog %s:', 'user-activation-email'), get_option('blogname')) . "\r\n\r\n"; 
+		$message .= sprintf(__('Username: %s', 'user-activation-email'), $user_login) . "\r\n\r\n"; 
+		$message .= sprintf(__('E-mail: %s', 'user-activation-email'), $user_email) . "\r\n"; 
 
-		@wp_mail(get_option('admin_email'), sprintf(__('[%s] New User Registration'), get_option('blogname')), $message); 
+		@wp_mail(get_option('admin_email'), sprintf(__('[%s] New User Registration', 'user-activation-email'), get_option('blogname')), $message); 
  
 		if ( empty($plaintext_pass) ) 
         	return; 
  
-     	$message  = sprintf(__('Username: %s'), $user_login) . "\r\n"; 
-     	$message .= sprintf(__('Password: %s'), $plaintext_pass) . "\r\n\n";
-     	$message .= sprintf(__('Activation Code: %s'), $activation_code) . "\r\n\n"; 
+     	$message  = sprintf(__('Username: %s', 'user-activation-email'), $user_login) . "\r\n"; 
+     	$message .= sprintf(__('Password: %s', 'user-activation-email'), $plaintext_pass) . "\r\n\n";
+     	$message .= sprintf(__('Activation Code: %s', 'user-activation-email'), $activation_code) . "\r\n\n"; 
      	$message .= wp_login_url() . "\r\n"; 
 
-		wp_mail($user_email, sprintf(__('[%s] Your username and password'), get_option('blogname')), $message);	
+		wp_mail($user_email, sprintf(__('[%s] Your username and password', 'user-activation-email'), get_option('blogname')), $message);	
 	}
 endif;
