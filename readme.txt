@@ -3,7 +3,7 @@
 Contributors: NateJacobs 
 Tags: user, registration, activation, email
 Requires at least: 3.0
-Tested up to: 3.2.1
+Tested up to: 3.3
 Stable tag: 0.3
 
 Require users to enter an activation code to access the site the first time. The activation code is emailed upon user registration.
