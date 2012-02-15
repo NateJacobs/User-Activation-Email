@@ -82,7 +82,7 @@ class UserActivationEmail
 			delete_user_meta( $user, self::user_meta );
 		}
 	}
-	
+		
 	/** 
 	 *	Check Activation Code
 	 *
@@ -102,35 +102,35 @@ class UserActivationEmail
 		$activation_code = '';
 		
 		// get user data by login
-		$user = get_user_by( 'login', $user_login );
-		
+		$user_info = get_user_by( 'login', $user_login );
+
 		// if the user has entered something in the user name box
-		if ( $user )
+		if ( $user_info )
 		{
 			// get the custom user meta defined during registration
-			$activation_code = get_user_meta( $user->ID, self::user_meta, true );
+			$activation_code = get_user_meta( $user_info->ID, self::user_meta, true );
 		}
 		if ( empty( $user_login ) || empty($password) )
 		{
 			if ( empty($username) )
-				$user = new WP_Error( 'empty_username', _e( '<strong>ERROR</strong>: The username field is empty.', 'user-activation-email' ) );
+				$user = new WP_Error( 'empty_username', __( '<strong>ERROR</strong>: The username field is empty.', 'user-activation-email' ) );
 	
 			if ( empty($password) )
-				$user = new WP_Error( 'empty_password', _e( '<strong>ERROR</strong>: The password field is empty.', 'user-activation-email' ) );
+				$user = new WP_Error( 'empty_password', __( '<strong>ERROR</strong>: The password field is empty.', 'user-activation-email' ) );
 		}
 		else
 		{
 			if ( $activation_code == 'active' )
 			{
-				return $user;
-				exit;
+					return $user;
+					exit;
 			}
 			// if the activation code entered by the user is not identical to the activation code
 			// stored in the *_usermeta table then deny access
 			if ( $_POST['activation-code'] !== $activation_code )
 			{
 				// register a new error with the error message set above
-				$user = new WP_Error( 'access_denied', _e( 'Sorry, that activation code does not match. Please try again. You can find the activation code in your welcome email.', 'user-activation-email' ) );
+				$user = new WP_Error( 'access_denied', __( 'Sorry, that activation code does not match. Please try again. You can find the activation code in your welcome email.', 'user-activation-email' ) );
 				// deny access to login and send back to login page
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20 );
 			}
