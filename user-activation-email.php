@@ -4,7 +4,7 @@
  *	Plugin Name: User Activation Email
  *	Plugin URI: https://github.com/NateJacobs/User-Activation-Email
  *	Description: Add an activation code to the new user email sent once a user registers. The user must enter this activation code in addition to a username and password to log in successfully the first time.
- *	Version: 0.3
+ *	Version: 0.4
  *	License: GPL V2
  *	Author: Nate Jacobs <nate@natejacobs.org>
  *	Author URI: http://natejacobs.org
