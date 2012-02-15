@@ -20,9 +20,6 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 
 == Changelog ==
 
-= 0.4 =
-Fixed authentication issue
-
 = 0.3 =
 WordPress 3.3 compatible
 Localized and available for translation
