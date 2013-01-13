@@ -4,7 +4,7 @@
  *	Plugin Name: User Activation Email
  *	Plugin URI: https://github.com/NateJacobs/User-Activation-Email
  *	Description: Add an activation code to the new user email sent once a user registers. The user must enter this activation code in addition to a username and password to log in successfully the first time.
- *	Version: 0.4
+ *	Version: 1.0
  *	License: GPL V2
  *	Author: Nate Jacobs <nate@natejacobs.org>
  *	Author URI: http://natejacobs.org
@@ -125,6 +125,12 @@ class UserActivationEmail
 					return $user;
 					exit;
 			}
+			
+			if ( !isset($_POST['activation-code'] ) ) 
+			{
+				$_POST['activation-code'] = false; 
+			}
+			
 			// if the activation code entered by the user is not identical to the activation code
 			// stored in the *_usermeta table then deny access
 			if ( $_POST['activation-code'] !== $activation_code )
@@ -170,7 +176,7 @@ class UserActivationEmail
 		?>
 		<p>
 			<label for="activation-code"><?php echo __( 'Activation Code (New User Only)', 'user-activation-email' ); ?><br>
-				<input type="text" id="activation-code" class="input" name="activation-code" tabindex="20" value="<?php if( isset( $_POST['activation-code'] ) ) echo $_POST['activation-code']; ?>">
+				<input type="text" id="activation-code" class="input" name="activation-code" tabindex="20" value="<?php if( isset( $_GET['uae-key'] ) ) echo $_GET['uae-key']; ?>">
 			</label>
 		</p>
 		<?php
@@ -301,7 +307,7 @@ if ( !function_exists('wp_new_user_notification') ) :
      	$message  = sprintf(__('Username: %s', 'user-activation-email'), $user_login) . "\r\n"; 
      	$message .= sprintf(__('Password: %s', 'user-activation-email'), $plaintext_pass) . "\r\n\n";
      	$message .= sprintf(__('Activation Code: %s', 'user-activation-email'), $activation_code) . "\r\n\n"; 
-     	$message .= wp_login_url() . "\r\n"; 
+     	$message .= wp_login_url().'?uae-key='.$activation_code."\r\n"; 
 
 		wp_mail($user_email, sprintf(__('[%s] Your username and password', 'user-activation-email'), get_option('blogname')), $message);	
 	}
