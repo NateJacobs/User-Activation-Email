@@ -18,6 +18,10 @@ The administrator may reset the activation code or enter a new one from the user
 
 Extract the zip file and just drop the contents in the wp-content/plugins/ directory of your WordPress installation and then activate the Plugin from Plugins page.
 
+== Screenshots ==
+1. Log in form
+2. User profile page
+
 == Changelog ==
 
 = 1.0 =
