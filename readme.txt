@@ -22,6 +22,7 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 
 = 1.0 =
 * Compatability with 3.5
+* Activation code field on log in form is filled in automatically if user clicks url in email.
 
 
 = 0.4 =
