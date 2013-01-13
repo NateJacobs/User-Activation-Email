@@ -232,6 +232,7 @@ class UserActivationEmail
 	 *
 	 *	@author		Nate Jacobs
 	 *	@since		0.2
+	 *	@updated	1.0
 	 *
 	 *	@param	string	$user
 	 */
@@ -283,6 +284,7 @@ if ( !function_exists('wp_new_user_notification') ) :
 	 *
 	 *	@author		Nate Jacobs
 	 *	@since		0.1
+	 *	@updated	1.0
 	 *
 	 *	@param	int	$user_id
 	 *	@param	string	$plaintext_pass
