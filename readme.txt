@@ -14,11 +14,14 @@ Adds an activation code to the new user email sent once a user registers. The us
 
 The administrator may reset the activation code or enter a new one from the users profile page.
 
+This plugin does not currently work with multi-site. Multi-site uses an activation key system for new registrations already.
+
 == Installation ==
 
 Extract the zip file and just drop the contents in the wp-content/plugins/ directory of your WordPress installation and then activate the Plugin from Plugins page.
 
 == Screenshots ==
+
 1. Log in form
 2. User profile page
 
@@ -26,7 +29,10 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 
 = 1.0 =
 * Compatability with 3.5
-* Activation code field on log in form is filled in automatically if user clicks url in email.
+* Activation code field on log in form is filled in automatically if user clicks url in email
+* Added a new column on the users list table to display if the user has activated their account or not
+* Fixed missing localization strings
+* Bumped minimum WordPress version to 3.1
 
 
 = 0.4 =
@@ -37,7 +43,7 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 * Localized and available for translation
 
 = 0.2 =
-* Added a field to the user profile that displays the activation code. This field is only shown to admins. 
+* Added a field, shown only to admins, to the user profile that displays the activation code 
 
 = 0.1 =
 * First version
