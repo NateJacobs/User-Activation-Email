@@ -196,8 +196,8 @@ class UserActivationEmail
 	 *	@author		Nate Jacobs
 	 *	@since		0.1
 	 *
-	 *	@param	int	$string_length
-	 *	@param	string	$character_set
+	 *	@param		int	$string_length
+	 *	@param		string	$character_set
 	 */
 	private function createRandomString( $string_length, $character_set ) 
 	{
@@ -219,7 +219,7 @@ class UserActivationEmail
 	 *	@author		Nate Jacobs
 	 *	@since		0.1
 	 *
-	 *	@param	int	$user_id
+	 *	@param		int	$user_id
 	 */
 	public function add_activation_code( $user_id )
 	{
@@ -239,18 +239,18 @@ class UserActivationEmail
 	 *	@since		0.2
 	 *	@updated	1.0
 	 *
-	 *	@param	string	$user
+	 *	@param		string	$user
 	 */
 	public function add_user_profile_fields( $user )
 	{
 		if ( current_user_can( 'manage_options', $user->ID ) )
 		{
 		?>
-		<h3>User Activation Email</h3>
-		<p>You may reset this user's activation code. If it reads 'active', the user has activated his/her account.</p>
+		<h3><?php _e( 'User Activation Email', 'user-activation-email' ); ?></h3>
+		<p><?php _e( 'You may reset this user\'s activation code. If it reads \'active\', the user has activated his/her account.', 'user-activation-email' ); ?></p>
 		<table class="form-table">
 		<tr>
-			<th><label for="activation-code">Activation Code (10 characters)</label></th>
+			<th><label for="activation-code"><?php _e( 'Activation Code (10 characters)', 'user-activation-email' ); ?></label></th>
 			<td>
 				<input type="text" id="activation-code" name="activation-code" value="<?php echo esc_attr( get_the_author_meta( self::user_meta, $user->ID ) ); ?>" class="regular-text">
 			</td>
