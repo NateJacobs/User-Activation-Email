@@ -31,6 +31,11 @@ class UserActivationEmail
 		add_action( 'edit_user_profile_update', array( __CLASS__, 'save_user_profile_fields' ) );
 		// since 0.3
 		register_activation_hook( __FILE__, array( __CLASS__, 'activate' ) );
+		// since 1.0
+		add_filter( 'manage_users_columns', array( __CLASS__, 'add_active_column' ) ); 
+		add_action( 'manage_users_custom_column', array( __CLASS__, 'show_active_column_content' ), 10, 3 );
+		add_filter( 'manage_users_sortable_columns', array( __CLASS__, 'sortable_active_column' ) );
+		add_action( 'pre_user_query', array( __CLASS__, 'sortable_active_query' ) );
 	}
 	
 	public function localization() {
@@ -270,6 +275,94 @@ class UserActivationEmail
 		if( !current_user_can( 'manage_options', $user_id ) )
 			return false;
 		update_user_meta( $user_id, self::user_meta, $_POST['activation-code'] );
+	}
+	
+	/** 
+	*	Add Active Custom Column
+	*
+	*	Add a new custom column to the user list table of 'Active'.
+	*
+	*	@author		Nate Jacobs
+	*	@date		1/13/13
+	*	@since		1.0
+	*
+	*	@param		array	$columns
+	*	@return		array	$columns (with the new column appended)
+	*/
+	public function add_active_column( $columns ) 
+	{
+    	$columns['active_user'] = __( 'Active', 'user-activation-email' );
+    	return $columns;
+    }
+
+    /** 
+    *	Display Active Custom Column
+    *
+	*	If the user account has been activated the column will display 'Yes', if not then 'No'.	
+    *
+    *	@author		Nate Jacobs
+    *	@date		1/13/13
+    *	@since		1.0
+    *
+    *	@param		string	$value
+    *	@param		array	$column_name
+    *	@param		string	$user_id
+    */
+    public function show_active_column_content( $empty, $column_name, $user_id ) 
+    {
+    	$user = get_userdata( $user_id );
+
+    	if( 'active' == $user->uae_user_activation_code )
+    	{
+	    	$active = __( 'Yes', 'user-activation-email' );
+    	}
+    	else
+    	{
+	    	$active = __( 'No', 'user-activation-email' );
+    	}
+    	
+    	if ( 'active_user' == $column_name )
+			return $active;
+	}
+	
+	/** 
+	*	Sortable Active Custom Column
+	*
+	*	Allow the new 'Active' custom column to be sortable.
+	*
+	*	@author		Nate Jacobs
+	*	@date		1/13/13
+	*	@since		1.0
+	*
+	*	@param		array	$columns	
+	*/
+	public function sortable_active_column( $columns ) 
+	{  
+	    $columns['active_user'] = 'active';  
+	    return $columns;  
+	}
+	
+	/** 
+	*	Sortable Active Custom Column Query
+	*
+	*	Rewrite the user query to allow sorting by the new 'Active' custom column.
+	*
+	*	@author		Nate Jacobs
+	*	@date		1/13/13
+	*	@since		1.0
+	*
+	*	@param		object	$query
+	*/
+	function sortable_active_query( $query )
+	{
+		if( !is_admin() )  
+			return;
+			
+		if( 'active' == $query->query_vars['orderby'] )
+		{
+			$query->query_where = str_replace( 'wp_2_capabilities', "uae_user_activation_code", $query->query_where );
+			$query->query_orderby = str_replace( 'user_login', "meta_value", $query->query_orderby );
+		}
 	}
 }
 new UserActivationEmail();
