@@ -23,10 +23,10 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 ## Screenshots ##
 
 ###1. Log in form###
-![Log in form](http://s.wordpress.org/extend/plugins/user-activation-email/screenshot-1.png)
+![Log in form](https://raw.github.com/NateJacobs/User-Activation-Email/master/screenshot-1.png)
 
 ###2. User profile page###
-![User profile page](http://s.wordpress.org/extend/plugins/user-activation-email/screenshot-2.png)
+![User profile page](https://raw.github.com/NateJacobs/User-Activation-Email/master/screenshot-2.png)
 
 
 ## Changelog ##
