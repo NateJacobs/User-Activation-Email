@@ -322,7 +322,11 @@ class UserActivationEmail
     	}
     	
     	if ( 'active_user' == $column_name )
-			return $active;
+      {
+			  return $active;
+      }
+
+      return $empty;
 	}
 	
 	/** 
