@@ -362,12 +362,13 @@ class UserActivationEmail
 	*/
 	function sortable_active_query( $query )
 	{
+		global $wpdb,$current_screen;
+		
 		if( !is_admin() )  
 			return;
 		
-	    if( 'active' == $query->query_vars['orderby'] )
+	    if( 'active' == $query->query_vars['orderby'] && 'users' == $current_screen->id )
 	    {
-	    		global $wpdb;
 			$query->query_where = "WHERE 1=1 AND ( $wpdb->usermeta.meta_key = 'uae_user_activation_code' AND $wpdb->usermeta.user_id = $wpdb->users.ID ) ";
 			$query->query_orderby = str_replace( 'user_login', "$wpdb->usermeta.meta_value", $query->query_orderby );
 	    }
