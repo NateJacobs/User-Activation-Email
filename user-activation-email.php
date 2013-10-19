@@ -18,24 +18,24 @@ class UserActivationEmail
 	public function __construct()
 	{
 		// since 0.3
-		add_action('init', array( __CLASS__, 'localization' ) );
+		add_action('init', array( $this, 'localization' ) );
 		// since 0.1
-		add_filter( 'authenticate', array( __CLASS__, 'check_user_activation_code' ), 11, 3 );
-		add_action( 'login_form', array( __CLASS__, 'add_login_field' ) );
-		add_action( 'user_register', array( __CLASS__, 'add_activation_code' ) );
-		add_action( 'wp_login', array( __CLASS__, 'update_activation_code' ) );
+		add_filter( 'authenticate', array( $this, 'check_user_activation_code' ), 11, 3 );
+		add_action( 'login_form', array( $this, 'add_login_field' ) );
+		add_action( 'user_register', array( $this, 'add_activation_code' ) );
+		add_action( 'wp_login', array( $this, 'update_activation_code' ) );
 		// since 0.2
-		add_action( 'show_user_profile', array( __CLASS__, 'add_user_profile_fields' ) );
-		add_action( 'edit_user_profile', array( __CLASS__, 'add_user_profile_fields' ) );
-		add_action( 'personal_options_update', array( __CLASS__, 'save_user_profile_fields' ) );
-		add_action( 'edit_user_profile_update', array( __CLASS__, 'save_user_profile_fields' ) );
+		add_action( 'show_user_profile', array( $this, 'add_user_profile_fields' ) );
+		add_action( 'edit_user_profile', array( $this, 'add_user_profile_fields' ) );
+		add_action( 'personal_options_update', array( $this, 'save_user_profile_fields' ) );
+		add_action( 'edit_user_profile_update', array( $this, 'save_user_profile_fields' ) );
 		// since 0.3
-		register_activation_hook( __FILE__, array( __CLASS__, 'activate' ) );
+		register_activation_hook( __FILE__, array( $this, 'activate' ) );
 		// since 1.0
-		add_filter( 'manage_users_columns', array( __CLASS__, 'add_active_column' ) ); 
-		add_action( 'manage_users_custom_column', array( __CLASS__, 'show_active_column_content' ), 10, 3 );
-		add_filter( 'manage_users_sortable_columns', array( __CLASS__, 'sortable_active_column' ) );
-		add_action( 'pre_user_query', array( __CLASS__, 'sortable_active_query' ) );
+		add_filter( 'manage_users_columns', array( $this, 'add_active_column' ) ); 
+		add_action( 'manage_users_custom_column', array( $this, 'show_active_column_content' ), 10, 3 );
+		add_filter( 'manage_users_sortable_columns', array( $this, 'sortable_active_column' ) );
+		add_action( 'pre_user_query', array( $this, 'sortable_active_query' ) );
 	}
 	
 	public function localization() {
@@ -64,7 +64,7 @@ class UserActivationEmail
 			add_user_meta( $user, self::user_meta, 'active' );
 		}
 		
-		register_uninstall_hook( __FILE__, array( __CLASS__, 'uninstall' ) );
+		register_uninstall_hook( __FILE__, array( $this, 'uninstall' ) );
 	}
 	
 	/** 
