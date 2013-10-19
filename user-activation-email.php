@@ -322,7 +322,11 @@ class UserActivationEmail
     	}
     	
     	if ( 'active_user' == $column_name )
-			return $active;
+      {
+			  return $active;
+      }
+
+      return $empty;
 	}
 	
 	/** 
@@ -357,12 +361,14 @@ class UserActivationEmail
 	{
 		if( !is_admin() )  
 			return;
-			
-		if( 'active' == $query->query_vars['orderby'] )
-		{
-			$query->query_where = str_replace( 'wp_2_capabilities', "uae_user_activation_code", $query->query_where );
-			$query->query_orderby = str_replace( 'user_login', "meta_value", $query->query_orderby );
-		}
+
+    global $wpdb;
+    if( 'active' == $query->query_vars['orderby'] )
+    {
+      $query->query_from = $query->query_from .",". $wpdb->usermeta;
+      $query->query_where = str_replace( 'WHERE 1=1', " WHERE ( $wpdb->usermeta.meta_key = 'uae_user_activation_code' AND $wpdb->usermeta.user_id = $wpdb->users.ID ) ", $query->query_where );
+      $query->query_orderby = str_replace( 'user_login', "meta_value", $query->query_orderby );
+    }
 	}
 }
 new UserActivationEmail();
