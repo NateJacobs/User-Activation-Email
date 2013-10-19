@@ -201,14 +201,14 @@ class UserActivationEmail
 	 */
 	private function createRandomString( $string_length, $character_set ) 
 	{
-	  $random_string = array();
-	  for ( $i = 1; $i <= $string_length; $i++ ) 
-	  {
-	    $rand_character = $character_set[rand(0, strlen( $character_set ) - 1)];
-	    $random_string[] = $rand_character;
-	  }
-	  shuffle( $random_string );
-	  return implode( '', $random_string );
+		$random_string = array();
+		for ( $i = 1; $i <= $string_length; $i++ ) 
+		{
+			$rand_character = $character_set[rand(0, strlen( $character_set ) - 1)];
+			$random_string[] = $rand_character;
+		}
+		shuffle( $random_string );
+		return implode( '', $random_string );
 	}
 	
 	/** 
@@ -291,8 +291,8 @@ class UserActivationEmail
 	*/
 	public function add_active_column( $columns ) 
 	{
-    	$columns['active_user'] = __( 'Active', 'user-activation-email' );
-    	return $columns;
+    		$columns['active_user'] = __( 'Active', 'user-activation-email' );
+		return $columns;
     }
 
     /** 
@@ -310,18 +310,18 @@ class UserActivationEmail
     */
     public function show_active_column_content( $empty, $column_name, $user_id ) 
     {
-    	$user = get_userdata( $user_id );
-
-    	if( 'active' == $user->uae_user_activation_code )
-    	{
-	    	$active = __( 'Yes', 'user-activation-email' );
-    	}
-    	else
-    	{
-	    	$active = __( 'No', 'user-activation-email' );
-    	}
-    	
-    	if ( 'active_user' == $column_name )
+	    	$user = get_userdata( $user_id );
+	
+	    	if( 'active' == $user->uae_user_activation_code )
+	    	{
+		    	$active = __( 'Yes', 'user-activation-email' );
+	    	}
+	    	else
+	    	{
+		    	$active = __( 'No', 'user-activation-email' );
+	    	}
+	    	
+	    	if ( 'active_user' == $column_name )
 			return $active;
 	}
 	
@@ -377,7 +377,7 @@ if ( !function_exists('wp_new_user_notification') ) :
 	 *
 	 *	@author		Nate Jacobs
 	 *	@since		0.1
-	 *	@updated	1.0
+	 *	@updated		1.0
 	 *
 	 *	@param	int	$user_id
 	 *	@param	string	$plaintext_pass
