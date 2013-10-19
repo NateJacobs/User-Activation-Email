@@ -311,18 +311,24 @@ class UserActivationEmail
     public function show_active_column_content( $empty, $column_name, $user_id ) 
     {
 	    	$user = get_userdata( $user_id );
-	
-	    	if( 'active' == $user->uae_user_activation_code )
-	    	{
-		    	$active = __( 'Yes', 'user-activation-email' );
-	    	}
-	    	else
-	    	{
-		    	$active = __( 'No', 'user-activation-email' );
-	    	}
 	    	
 	    	if ( 'active_user' == $column_name )
+		{
+			if( 'active' == $user->uae_user_activation_code )
+		    	{
+			    	$active = __( 'Yes', 'user-activation-email' );
+		    	}
+		    	else
+		    	{
+			    	$active = __( 'No', 'user-activation-email' );
+		    	}
+	    	
 			return $active;
+		}
+		else
+		{
+			return $empty;
+		}
 	}
 	
 	/** 
@@ -357,12 +363,13 @@ class UserActivationEmail
 	{
 		if( !is_admin() )  
 			return;
-			
-		if( 'active' == $query->query_vars['orderby'] )
-		{
-			$query->query_where = str_replace( 'wp_2_capabilities', "uae_user_activation_code", $query->query_where );
-			$query->query_orderby = str_replace( 'user_login', "meta_value", $query->query_orderby );
-		}
+		
+	    if( 'active' == $query->query_vars['orderby'] )
+	    {
+	    		global $wpdb;
+			$query->query_where = "WHERE 1=1 AND ( $wpdb->usermeta.meta_key = 'uae_user_activation_code' AND $wpdb->usermeta.user_id = $wpdb->users.ID ) ";
+			$query->query_orderby = str_replace( 'user_login', "$wpdb->usermeta.meta_value", $query->query_orderby );
+	    }
 	}
 }
 new UserActivationEmail();
