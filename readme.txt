@@ -2,9 +2,9 @@
 
 Contributors: NateJacobs 
 Tags: user, registration, activation, email
-Requires at least: 3.1
-Tested up to: 3.5
-Stable tag: 1.0
+Requires at least: 3.5
+Tested up to: 3.7
+Stable tag: 1.1
 
 Require users to enter an activation code to access the site the first time. The activation code is emailed upon user registration.
 
@@ -26,6 +26,11 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 2. User profile page
 
 == Changelog ==
+
+= 1.1 =
+* Compatability with 3.7
+* Fix active users column sorting
+* Fix incorrect display of data in user list table
 
 = 1.0 =
 * Compatability with 3.5
