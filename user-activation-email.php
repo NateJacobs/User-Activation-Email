@@ -12,13 +12,11 @@
 
 class UserActivationEmail
 {
-	CONST user_meta = "uae_user_activation_code";
+	protected $user_meta = "uae_user_activation_code";
 	
 	// hook into actions and filters
 	public function __construct()
 	{
-		// since 0.3
-		add_action('init', array( $this, 'localization' ) );
 		// since 0.1
 		add_filter( 'authenticate', array( $this, 'check_user_activation_code' ), 11, 3 );
 		add_action( 'login_form', array( $this, 'add_login_field' ) );
@@ -31,6 +29,7 @@ class UserActivationEmail
 		add_action( 'edit_user_profile_update', array( $this, 'save_user_profile_fields' ) );
 		// since 0.3
 		register_activation_hook( __FILE__, array( $this, 'activate' ) );
+		add_action( 'init', array( $this, 'localization' ) );
 		// since 1.0
 		add_filter( 'manage_users_columns', array( $this, 'add_active_column' ) ); 
 		add_action( 'manage_users_custom_column', array( $this, 'show_active_column_content' ), 10, 3 );
@@ -61,7 +60,7 @@ class UserActivationEmail
 		foreach ( $users as $user )
 		{
 			// add the custom user meta to the wp_usermeta table
-			add_user_meta( $user, self::user_meta, 'active' );
+			add_user_meta( $user, $this->user_meta, 'active' );
 		}
 		
 		register_uninstall_hook( __FILE__, array( $this, 'uninstall' ) );
@@ -84,7 +83,7 @@ class UserActivationEmail
 		foreach ( $users as $user )
 		{
 			// delete the custom user meta in the wp_usermeta table
-			delete_user_meta( $user, self::user_meta );
+			delete_user_meta( $user, $this->user_meta );
 		}
 	}
 		
@@ -113,7 +112,7 @@ class UserActivationEmail
 		if ( $user_info )
 		{
 			// get the custom user meta defined during registration
-			$activation_code = get_user_meta( $user_info->ID, self::user_meta, true );
+			$activation_code = get_user_meta( $user_info->ID, $this->user_meta, true );
 		}
 		if ( empty( $user_login ) || empty($password) )
 		{
@@ -165,7 +164,7 @@ class UserActivationEmail
 		// get user data by login
 		$user = get_user_by( 'login', $user_login );
 		// change the custom user meta to show the user has already activated
-		update_user_meta( $user->ID, self::user_meta, 'active' );
+		update_user_meta( $user->ID, $this->user_meta, 'active' );
 	}
 	
 	/** 
@@ -188,30 +187,6 @@ class UserActivationEmail
 	}
 	
 	/** 
-	 *	Generate the Activation Code
-	 *
-	 *	Helper function that creates a random activation code.
-	 *	http://paulmason.name/blog/item/unique-random-alphanumeric-string-generator-in-php
-	 *
-	 *	@author		Nate Jacobs
-	 *	@since		0.1
-	 *
-	 *	@param		int	$string_length
-	 *	@param		string	$character_set
-	 */
-	private function createRandomString( $string_length, $character_set ) 
-	{
-		$random_string = array();
-		for ( $i = 1; $i <= $string_length; $i++ ) 
-		{
-			$rand_character = $character_set[rand(0, strlen( $character_set ) - 1)];
-			$random_string[] = $rand_character;
-		}
-		shuffle( $random_string );
-		return implode( '', $random_string );
-	}
-	
-	/** 
 	 *	Add Activation Code
 	 *
 	 *	Generates the random activation code and adds it to the user_meta during user registration.
@@ -223,10 +198,11 @@ class UserActivationEmail
 	 */
 	public function add_activation_code( $user_id )
 	{
-		$character_set = 'abcdefghjkmnpqrstuvwxyz23456789#';
-		$string_length = 10;
-		$activation_code = self::createRandomString( $string_length, $character_set );
-		add_user_meta( $user_id, self::user_meta, $activation_code );
+		// generate activation code
+		$activation_code = wp_generate_password( 10 );
+		
+		// add to the user meta
+		add_user_meta( $user_id, $this->user_meta, $activation_code );
 	}
 	
 	/** 
@@ -243,16 +219,16 @@ class UserActivationEmail
 	 */
 	public function add_user_profile_fields( $user )
 	{
-		if ( current_user_can( 'manage_options', $user->ID ) )
+		if( current_user_can( 'manage_options', $user->ID ) )
 		{
 		?>
 		<h3><?php _e( 'User Activation Email', 'user-activation-email' ); ?></h3>
-		<p><?php _e( 'You may reset this user\'s activation code. If it reads \'active\', the user has activated his/her account.', 'user-activation-email' ); ?></p>
+		<p><?php _e( 'You may reset this user\'s activation code. If it reads \'active\', the user has activated their account.', 'user-activation-email' ); ?></p>
 		<table class="form-table">
 		<tr>
 			<th><label for="activation-code"><?php _e( 'Activation Code (10 characters)', 'user-activation-email' ); ?></label></th>
 			<td>
-				<input type="text" id="activation-code" name="activation-code" value="<?php echo esc_attr( get_the_author_meta( self::user_meta, $user->ID ) ); ?>" class="regular-text">
+				<input type="text" id="activation-code" name="activation-code" value="<?php echo esc_attr( get_the_author_meta( $this->user_meta, $user->ID ) ); ?>" class="regular-text">
 			</td>
 		</tr>
 		</table>
@@ -274,7 +250,7 @@ class UserActivationEmail
 	{
 		if( !current_user_can( 'manage_options', $user_id ) )
 			return false;
-		update_user_meta( $user_id, self::user_meta, $_POST['activation-code'] );
+		update_user_meta( $user_id, $this->user_meta, $_POST['activation-code'] );
 	}
 	
 	/** 
