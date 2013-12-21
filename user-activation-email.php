@@ -4,7 +4,7 @@
  *	Plugin Name: User Activation Email
  *	Plugin URI: https://github.com/NateJacobs/User-Activation-Email
  *	Description: Add an activation code to the new user email sent once a user registers. The user must enter this activation code in addition to a username and password to log in successfully the first time.
- *	Version: 1.1
+ *	Version: 1.2
  *	License: GPL V2
  *	Author: Nate Jacobs <nate@natejacobs.org>
  *	Author URI: http://natejacobs.org
@@ -12,7 +12,7 @@
 
 class UserActivationEmail
 {
-	protected $user_meta = "uae_user_activation_code";
+	protected $user_meta = 'uae_user_activation_code';
 	
 	// hook into actions and filters
 	public function __construct()
@@ -22,14 +22,17 @@ class UserActivationEmail
 		add_action( 'login_form', array( $this, 'add_login_field' ) );
 		add_action( 'user_register', array( $this, 'add_activation_code' ) );
 		add_action( 'wp_login', array( $this, 'update_activation_code' ) );
+		
 		// since 0.2
 		add_action( 'show_user_profile', array( $this, 'add_user_profile_fields' ) );
 		add_action( 'edit_user_profile', array( $this, 'add_user_profile_fields' ) );
 		add_action( 'personal_options_update', array( $this, 'save_user_profile_fields' ) );
 		add_action( 'edit_user_profile_update', array( $this, 'save_user_profile_fields' ) );
+		
 		// since 0.3
 		register_activation_hook( __FILE__, array( $this, 'activate' ) );
-		add_action( 'init', array( $this, 'localization' ) );
+		add_action( 'plugins_loaded', array( $this, 'add_textdomain' ) );
+		
 		// since 1.0
 		add_filter( 'manage_users_columns', array( $this, 'add_active_column' ) ); 
 		add_action( 'manage_users_custom_column', array( $this, 'show_active_column_content' ), 10, 3 );
@@ -37,7 +40,8 @@ class UserActivationEmail
 		add_action( 'pre_user_query', array( $this, 'sortable_active_query' ) );
 	}
 	
-	public function localization() {
+	public function add_textdomain() 
+	{
   		load_plugin_textdomain( 'user-activation-email', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' ); 
 	}
 	
@@ -45,8 +49,7 @@ class UserActivationEmail
 	 *	Activation
 	 *
 	 *	Upon plugin activation create a custom user meta key of uae_user_activation_code
-	 *	for all users and set the value to active (user is already active). Also registers
-	 *	uninstall hook.
+	 *	for all users and set the value to active (user is already active). 
 	 *
 	 *	@author		Nate Jacobs
 	 *	@since		0.3
@@ -54,39 +57,15 @@ class UserActivationEmail
 	public function activate()
 	{
 		// limit user data returned to just the id
-		$args = array( 'fields' => 'ID' );
-		$users = get_users( $args );
+		$users = get_users( array( 'fields' => 'ID' ) );
 		// loop through each user
-		foreach ( $users as $user )
+		foreach( $users as $user )
 		{
 			// add the custom user meta to the wp_usermeta table
-			add_user_meta( $user, $this->user_meta, 'active' );
+			add_user_meta( $user, $this->user_meta, 'active', true );
 		}
-		
-		register_uninstall_hook( __FILE__, array( $this, 'uninstall' ) );
 	}
 	
-	/** 
-	 *	Uninstall
-	 *
-	 *	Loops through all users and removes the user meta of uae_user_activation_code
-	 *
-	 *	@author		Nate Jacobs
-	 *	@since		0.3
-	 */
-	public function uninstall()
-	{
-		// limit user data returned to just the id
-		$args = array( 'fields' => 'ID' );
-		$users = get_users( $args );
-		// loop through each user
-		foreach ( $users as $user )
-		{
-			// delete the custom user meta in the wp_usermeta table
-			delete_user_meta( $user, $this->user_meta );
-		}
-	}
-		
 	/** 
 	 *	Check Activation Code
 	 *
