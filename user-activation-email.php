@@ -349,7 +349,7 @@ if ( !function_exists('wp_new_user_notification') ) :
 	function wp_new_user_notification( $user_id, $plaintext_pass = '' )
 	{
 		$user = new WP_User($user_id);
-		$activation_code = get_user_meta( $user->ID, UserActivationEmail::user_meta, true ); 
+		$activation_code = get_user_meta( $user->ID, 'uae_user_activation_code', true ); 
 
 		$user_login = stripslashes($user->user_login); 
 		$user_email = stripslashes($user->user_email); 
