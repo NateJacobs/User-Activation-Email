@@ -4,7 +4,7 @@
  *	Plugin Name: User Activation Email
  *	Plugin URI: https://github.com/NateJacobs/User-Activation-Email
  *	Description: Add an activation code to the new user email sent once a user registers. The user must enter this activation code in addition to a username and password to log in successfully the first time.
- *	Version: 1.2.1
+ *	Version: 1.2.2
  *	License: GPL V2
  *	Author: Nate Jacobs <nate@natejacobs.org>
  *	Author URI: http://natejacobs.org
@@ -82,49 +82,65 @@ class UserActivationEmail
 	 */
 	public function check_user_activation_code( $user, $user_login, $password )
 	{
+		// get the error class ready
+		$error = new \WP_Error();
+		
 		$activation_code = '';
 		
-		// get user data by login
+		// first check if either of the two fields are empty
+		if ( empty( $user_login ) || empty( $password ) )
+		{
+			// figure out which one
+			if ( empty( $user_login ) )
+				$error->add( 'empty_username', __( 'The username field is empty.', 'user-activation-email' ) );
+	
+			if ( empty( $password ) )
+				$error->add( 'empty_password', __( 'The password field is empty.', 'user-activation-email' ) );
+				
+			// remove the ability to authenticate	
+			remove_action( 'authenticate', 'wp_authenticate_username_password', 20 );
+			
+			// return appropriate error
+			return $error;
+		}
+		
 		$user_info = get_user_by( 'login', $user_login );
-
-		// if the user has entered something in the user name box
-		if ( $user_info )
+		
+		// if the object is empty, meaning an invalid username
+		if( empty( $user_info ) )
+		{
+			// add the error message for invalid username
+			$error->add( 'incorrect user', __( 'Username does not exist', 'user-activation-email' ) );
+			
+			// remove the ability to authenticate
+			remove_action( 'authenticate', 'wp_authenticate_username_password', 20 );
+			
+			// return appropriate error
+			return $error;
+		}
+		else
 		{
 			// get the custom user meta defined during registration
 			$activation_code = get_user_meta( $user_info->ID, $this->user_meta, true );
 		}
-		if ( empty( $user_login ) || empty($password) )
+		
+		if( $activation_code == 'active' )
 		{
-			if ( empty($username) )
-				$user = new WP_Error( 'empty_username', __( '<strong>ERROR</strong>: The username field is empty.', 'user-activation-email' ) );
-	
-			if ( empty($password) )
-				$user = new WP_Error( 'empty_password', __( '<strong>ERROR</strong>: The password field is empty.', 'user-activation-email' ) );
+			return $user;
+			exit;
 		}
 		else
 		{
-			if ( $activation_code == 'active' )
-			{
-					return $user;
-					exit;
-			}
-			
-			if ( !isset($_POST['activation-code'] ) ) 
-			{
-				$_POST['activation-code'] = false; 
-			}
-			
-			// if the activation code entered by the user is not identical to the activation code
-			// stored in the *_usermeta table then deny access
-			if ( $_POST['activation-code'] !== $activation_code )
+			if( $_POST['activation-code'] !== $activation_code )
 			{
 				// register a new error with the error message set above
 				$user = new WP_Error( 'access_denied', __( 'Sorry, that activation code does not match. Please try again. You can find the activation code in your welcome email.', 'user-activation-email' ) );
 				// deny access to login and send back to login page
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20 );
+				
+				return $user;
 			}
-		}	
-		return $user;
+		}		
 	}
 	
 	/** 
