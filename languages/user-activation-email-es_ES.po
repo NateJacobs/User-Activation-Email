@@ -1,0 +1,70 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: User Activation Email\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-12-12 23:55-0700\n"
+"PO-Revision-Date: 2014-02-03 10:19+0100\n"
+"Last-Translator: jelena kovacevic <jecajeca260@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-Basepath: ../\n"
+"X-Generator: Poedit 1.5.5\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: user-activation-email.php:116
+msgid "<strong>ERROR</strong>: The username field is empty."
+msgstr "<strong>ERROR</strong>: El campo para el nombre de usuario está vacío."
+
+#: user-activation-email.php:119
+msgid "<strong>ERROR</strong>: The password field is empty."
+msgstr "<strong>ERROR</strong>: El campo para la contraseña está vacío."
+
+#: user-activation-email.php:133
+msgid ""
+"Sorry, that activation code does not match. Please try again. You can find "
+"the activation code in your welcome email."
+msgstr ""
+"Lo sentimos, el código de activación no coincide. Por favor intente de "
+"nuevo. Puede encontrar el código de activación en su email de bienvenida."
+
+#: user-activation-email.php:172
+msgid "Activation Code (New User Only)"
+msgstr "Código de Activación (Nuevo Usuario Sólamente)"
+
+#: user-activation-email.php:292
+#, php-format
+msgid "New user registration on your blog %s:"
+msgstr "Nuevo registro de usuario en su blog %s:"
+
+#: user-activation-email.php:293 user-activation-email.php:301
+#, php-format
+msgid "Username: %s"
+msgstr "Nombre de Usuario: %s"
+
+#: user-activation-email.php:294
+#, php-format
+msgid "E-mail: %s"
+msgstr "E-mail: %s"
+
+#: user-activation-email.php:296
+#, php-format
+msgid "[%s] New User Registration"
+msgstr "[%s] Registro de Nuevo Usuario"
+
+#: user-activation-email.php:302
+#, php-format
+msgid "Password: %s"
+msgstr "Contraseña: %s"
+
+#: user-activation-email.php:303
+#, php-format
+msgid "Activation Code: %s"
+msgstr "Activation Code: %s"
+
+#: user-activation-email.php:306
+#, php-format
+msgid "[%s] Your username and password"
+msgstr "[%s] Su nombre de usuario y contraseña"
