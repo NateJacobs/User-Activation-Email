@@ -4,7 +4,7 @@
  *	Plugin Name: User Activation Email
  *	Plugin URI: https://github.com/NateJacobs/User-Activation-Email
  *	Description: Add an activation code to the new user email sent once a user registers. The user must enter this activation code in addition to a username and password to log in successfully the first time.
- *	Version: 1.2.2
+ *	Version: 1.3.0
  *	License: GPL V2
  *	Author: Nate Jacobs <nate@natejacobs.org>
  *	Author URI: http://natejacobs.org
@@ -38,8 +38,30 @@ class UserActivationEmail
 		add_action( 'manage_users_custom_column', array( $this, 'show_active_column_content' ), 10, 3 );
 		add_filter( 'manage_users_sortable_columns', array( $this, 'sortable_active_column' ) );
 		add_action( 'pre_user_query', array( $this, 'sortable_active_query' ) );
+		
+		// since 1.3.0
+		add_filter( 'registration_redirect', array( $this, 'redirect_after_registration' ) );
 	}
 	
+	/** 
+	 *	Redirect the user home after the registration is complete. 
+	 *
+	 *	@author		Nate Jacobs
+	 *	@since		1.3.0
+	 * 
+	 * 	@param	string $url the url to redirect to
+	 */
+	public function redirect_after_registration( $url )
+	{
+		return home_url();
+	}
+	
+	/** 
+	 *	Localization 
+	 *
+	 *	@author		Nate Jacobs
+	 *	@since		0.3
+	 */
 	public function add_textdomain() 
 	{
   		load_plugin_textdomain( 'user-activation-email', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' ); 
