@@ -27,6 +27,11 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 
 == Changelog ==
 
+
+= 1.3.1 = 
+* Altered activation process to handle large numbers of users (250k+) on slow hardware.  
+* Added a series of actions and filters to wp_new_user_notification to allow for greater control over the email sent to the user
+
 = 1.3.0 =
 * Add a redirect after registration to the home page.
 
@@ -52,7 +57,6 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 * Added a new column on the users list table to display if the user has activated their account or not
 * Fixed missing localization strings
 * Bumped minimum WordPress version to 3.1
-
 
 = 0.4 =
 * Fixed authentication issue

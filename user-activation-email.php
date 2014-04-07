@@ -4,7 +4,7 @@
  *	Plugin Name: User Activation Email
  *	Plugin URI: https://github.com/NateJacobs/User-Activation-Email
  *	Description: Add an activation code to the new user email sent once a user registers. The user must enter this activation code in addition to a username and password to log in successfully the first time.
- *	Version: 1.3.0
+ *	Version: 1.3.1
  *	License: GPL V2
  *	Author: Nate Jacobs <nate@natejacobs.org>
  *	Author URI: http://natejacobs.org
@@ -38,9 +38,10 @@ class UserActivationEmail
 		add_action( 'manage_users_custom_column', array( $this, 'show_active_column_content' ), 10, 3 );
 		add_filter( 'manage_users_sortable_columns', array( $this, 'sortable_active_column' ) );
 		add_action( 'pre_user_query', array( $this, 'sortable_active_query' ) );
-		
+
 		// since 1.3.0
 		add_filter( 'registration_redirect', array( $this, 'redirect_after_registration' ) );
+
 	}
 	
 	/** 
@@ -78,16 +79,22 @@ class UserActivationEmail
 	 */
 	public function activate()
 	{
-		// limit user data returned to just the id
-		$users = get_users( array( 'fields' => 'ID' ) );
-		// loop through each user
-		foreach( $users as $user )
-		{
+		global $wpdb;
+
+		set_time_limit (120); // added because it takes forever to activate over .27 Million users.			
+		$sql = "SELECT `ID` FROM {$wpdb->users} WHERE `ID` NOT IN
+				(SELECT `user_id` FROM {$wpdb->usermeta} WHERE `meta_key` = 'uae_user_activation_code')";
+
+		$users = $wpdb->get_col($sql);
+
+		foreach($users as $user) {
+			set_time_limit (10); // reset the clock every iteration
 			// add the custom user meta to the wp_usermeta table
 			add_user_meta( $user, $this->user_meta, 'active', true );
 		}
+
 	}
-	
+
 	/** 
 	 *	Check Activation Code
 	 *
@@ -386,6 +393,9 @@ if ( !function_exists('wp_new_user_notification') ) :
 	 */
 	function wp_new_user_notification( $user_id, $plaintext_pass = '' )
 	{
+		// pre-notification setup
+		do_action("uae_start_new_user_notifcation");
+
 		$user = new WP_User($user_id);
 		$activation_code = get_user_meta( $user->ID, 'uae_user_activation_code', true ); 
 
@@ -396,7 +406,14 @@ if ( !function_exists('wp_new_user_notification') ) :
 		$message .= sprintf(__('Username: %s', 'user-activation-email'), $user_login) . "\r\n\r\n"; 
 		$message .= sprintf(__('E-mail: %s', 'user-activation-email'), $user_email) . "\r\n"; 
 
-		@wp_mail(get_option('admin_email'), sprintf(__('[%s] New User Registration', 'user-activation-email'), get_option('blogname')), $message); 
+		// you can skip the admin email if the uae_admin_email filter return false
+		$admin_email = apply_filters('uae_admin_email', get_option('admin_email'));
+		$message = apply_filters('uae_admin_message', $message, $admin_email, $user_login, $user_email, $plaintext_pass, $activation_code);
+		$subject = apply_filters('uae_admin_message_subject', sprintf(__('[%s] New User Registration', 'user-activation-email'), get_option('blogname')), $admin_email, $user_login, $user_email, $plaintext_pass, $activation_code);
+
+		if ($admin_email) {
+			@wp_mail($admin_email, $subject, $message); 
+		}
  
 		if ( empty($plaintext_pass) ) 
         	return; 
@@ -406,6 +423,17 @@ if ( !function_exists('wp_new_user_notification') ) :
      	$message .= sprintf(__('Activation Code: %s', 'user-activation-email'), $activation_code) . "\r\n\n"; 
      	$message .= wp_login_url().'?uae-key='.$activation_code."\r\n"; 
 
-		wp_mail($user_email, sprintf(__('[%s] Your username and password', 'user-activation-email'), get_option('blogname')), $message);	
+		$message = apply_filters('uae_user_message', $message, $user_login, $user_email, $plaintext_pass, $activation_code);
+		$subject = apply_filters('uae_user_message_subject', sprintf(__('[%s] Your username and password', 'user-activation-email'), get_option('blogname')), $user_login, $user_email, $plaintext_pass, $activation_code);
+
+		wp_mail($user_email, $subject, $message);	
+
+		// post-notification teardown
+		do_action("uae_end_new_user_notifcation");
+
 	}
 endif;
+
+
+
+
