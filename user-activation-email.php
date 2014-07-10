@@ -4,7 +4,7 @@
  *	Plugin Name: User Activation Email
  *	Plugin URI: https://github.com/NateJacobs/User-Activation-Email
  *	Description: Add an activation code to the new user email sent once a user registers. The user must enter this activation code in addition to a username and password to log in successfully the first time.
- *	Version: 1.3.0
+ *	Version: 1.2.3
  *	License: GPL V2
  *	Author: Nate Jacobs <nate@natejacobs.org>
  *	Author URI: http://natejacobs.org
@@ -38,22 +38,6 @@ class UserActivationEmail
 		add_action( 'manage_users_custom_column', array( $this, 'show_active_column_content' ), 10, 3 );
 		add_filter( 'manage_users_sortable_columns', array( $this, 'sortable_active_column' ) );
 		add_action( 'pre_user_query', array( $this, 'sortable_active_query' ) );
-		
-		// since 1.3.0
-		add_filter( 'registration_redirect', array( $this, 'redirect_after_registration' ) );
-	}
-	
-	/** 
-	 *	Redirect the user home after the registration is complete. 
-	 *
-	 *	@author		Nate Jacobs
-	 *	@since		1.3.0
-	 * 
-	 * 	@param	string $url the url to redirect to
-	 */
-	public function redirect_after_registration( $url )
-	{
-		return home_url();
 	}
 	
 	/** 
@@ -153,7 +137,7 @@ class UserActivationEmail
 		}
 		else
 		{
-			if( $_POST['activation-code'] !== $activation_code )
+			if( urldecode( $_POST['activation-code'] ) !== $activation_code )
 			{
 				// register a new error with the error message set above
 				$user = new WP_Error( 'access_denied', __( 'Sorry, that activation code does not match. Please try again. You can find the activation code in your welcome email.', 'user-activation-email' ) );
@@ -379,7 +363,7 @@ if ( !function_exists('wp_new_user_notification') ) :
 	 *
 	 *	@author		Nate Jacobs
 	 *	@since		0.1
-	 *	@updated		1.0
+	 *	@updated	1.0
 	 *
 	 *	@param	int	$user_id
 	 *	@param	string	$plaintext_pass
@@ -387,7 +371,7 @@ if ( !function_exists('wp_new_user_notification') ) :
 	function wp_new_user_notification( $user_id, $plaintext_pass = '' )
 	{
 		$user = new WP_User($user_id);
-		$activation_code = get_user_meta( $user->ID, 'uae_user_activation_code', true ); 
+		$activation_code = urlencode( get_user_meta( $user->ID, 'uae_user_activation_code', true ) ); 
 
 		$user_login = stripslashes($user->user_login); 
 		$user_email = stripslashes($user->user_email); 
@@ -398,9 +382,11 @@ if ( !function_exists('wp_new_user_notification') ) :
 
 		@wp_mail(get_option('admin_email'), sprintf(__('[%s] New User Registration', 'user-activation-email'), get_option('blogname')), $message); 
  
-		if ( empty($plaintext_pass) ) 
-        	return; 
- 
+		if ( empty($plaintext_pass) )
+		{
+			return;
+		}
+        
      	$message  = sprintf(__('Username: %s', 'user-activation-email'), $user_login) . "\r\n"; 
      	$message .= sprintf(__('Password: %s', 'user-activation-email'), $plaintext_pass) . "\r\n\n";
      	$message .= sprintf(__('Activation Code: %s', 'user-activation-email'), $activation_code) . "\r\n\n"; 
