@@ -137,7 +137,7 @@ class UserActivationEmail
 		}
 		else
 		{
-			if( urldecode( $_POST['activation-code'] ) !== $activation_code )
+			if( $_POST['activation-code'] !== $activation_code )
 			{
 				// register a new error with the error message set above
 				$user = new WP_Error( 'access_denied', __( 'Sorry, that activation code does not match. Please try again. You can find the activation code in your welcome email.', 'user-activation-email' ) );
@@ -181,7 +181,7 @@ class UserActivationEmail
 		?>
 		<p>
 			<label for="activation-code"><?php echo __( 'Activation Code (New User Only)', 'user-activation-email' ); ?><br>
-				<input type="text" id="activation-code" class="input" name="activation-code" tabindex="20" value="<?php if( isset( $_GET['uae-key'] ) ) echo $_GET['uae-key']; ?>">
+				<input type="text" id="activation-code" class="input" name="activation-code" tabindex="20" value="<?php if( isset( $_GET['uae-key'] ) ) echo urldecode( $_GET['uae-key'] ); ?>">
 			</label>
 		</p>
 		<?php
@@ -371,7 +371,7 @@ if ( !function_exists('wp_new_user_notification') ) :
 	function wp_new_user_notification( $user_id, $plaintext_pass = '' )
 	{
 		$user = new WP_User($user_id);
-		$activation_code = urlencode( get_user_meta( $user->ID, 'uae_user_activation_code', true ) ); 
+		$activation_code = get_user_meta( $user->ID, 'uae_user_activation_code', true );
 
 		$user_login = stripslashes($user->user_login); 
 		$user_email = stripslashes($user->user_email); 
@@ -390,7 +390,7 @@ if ( !function_exists('wp_new_user_notification') ) :
      	$message  = sprintf(__('Username: %s', 'user-activation-email'), $user_login) . "\r\n"; 
      	$message .= sprintf(__('Password: %s', 'user-activation-email'), $plaintext_pass) . "\r\n\n";
      	$message .= sprintf(__('Activation Code: %s', 'user-activation-email'), $activation_code) . "\r\n\n"; 
-     	$message .= wp_login_url().'?uae-key='.$activation_code."\r\n"; 
+     	$message .= wp_login_url().'?uae-key='.urlencode( $activation_code )."\r\n"; 
 
 		wp_mail($user_email, sprintf(__('[%s] Your username and password', 'user-activation-email'), get_option('blogname')), $message);	
 	}
