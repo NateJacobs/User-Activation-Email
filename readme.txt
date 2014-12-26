@@ -16,6 +16,8 @@ The administrator may reset the activation code or enter a new one from the user
 
 This plugin does not currently work with multi-site. Multi-site uses an activation key system for new registrations already.
 
+Spanish translation by Andrew Kurtis of [WebHostingHub](http://www.webhostinghub.com).
+
 == Installation ==
 
 Extract the zip file and just drop the contents in the wp-content/plugins/ directory of your WordPress installation and then activate the Plugin from Plugins page.
